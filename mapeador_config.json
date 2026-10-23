@@ -1,0 +1,44 @@
+{
+"formatos_libro": {
+"Formato 5-1 Libro Diario (SUNAT / Estándar)": {
+"skiprows": 5,
+"col_fecha": "Fecha de la operación",
+"col_id": "N°",
+"col_glosa": "Glosa o Descripción de la operación",
+"col_debe": "DEBE",
+"col_haber": "HABER",
+"col_cuenta": "Codigo",
+"filtro_cuenta_prefijo": "104",
+"tipo_monto": "DEBE_HABER"
+},
+"SAP Financials": {
+"skiprows": 0,
+"col_fecha": "DocDate",
+"col_id": "TransId",
+"col_glosa": "HeaderMemo",
+"col_monto": "DocTotal",
+"col_cuenta": "AcctCode",
+"filtro_cuenta_prefijo": "",
+"tipo_monto": "MONTO_UNICO"
+},
+"Estándar Genérico (Simple)": {
+"skiprows": 0,
+"col_fecha": "Fecha",
+"col_id": "ID_Ref",
+"col_glosa": "Concepto",
+"col_monto": "Monto",
+"col_cuenta": "",
+"filtro_cuenta_prefijo": "",
+"tipo_monto": "MONTO_UNICO"
+}
+},
+"formatos_banco": {
+"Banco Estándar (CSV / Excel)": {
+"skiprows": 0,
+"col_fecha": "Fecha",
+"col_id": "ID_Transaccion",
+"col_monto": "Monto",
+"col_descripcion": "Descripcion"
+}
+}
+}
