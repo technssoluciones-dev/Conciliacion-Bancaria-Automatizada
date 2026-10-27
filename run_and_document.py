@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 from mss import mss
 import imageio
+import re
 
 def record_process(stop_event, frames_list):
     fps = 10.0  # 10 FPS estables para mantener un GIF liviano y fluido
@@ -27,10 +28,9 @@ def record_process(stop_event, frames_list):
             current_time = time.time()
             if current_time >= next_frame_time:
                 img = np.array(sct.grab(monitor))
-                # Convertir de BGRA a RGB (ImageIO espera formato RGB para los GIFs)
+                # Convertir de BGRA a RGB
                 frame = cv2.cvtColor(img, cv2.COLOR_BGRA2RGB)
                 
-                # Redimensionar el fotograma para optimizar el peso del GIF
                 resized_frame = cv2.resize(frame, (target_width, target_height), interpolation=cv2.INTER_AREA)
                 frames_list.append(resized_frame)
                 
@@ -48,7 +48,9 @@ def update_readme():
 
     content = readme_path.read_text(encoding="utf-8")
     
-    # Sintaxis estándar de Markdown compatible con GIFs animados en GitHub
+    # Limpiar cualquier sección de demo anterior para evitar duplicados
+    content = re.sub(r'\n## 🎥 Demostración.*?(?=\n# |$)', '', content, flags=re.DOTALL)
+    
     demo_section = """
 ## 🎥 Demostración y Funcionamiento del Sistema
 
@@ -64,19 +66,18 @@ def update_readme():
 </p>
 """
 
-    # Limpiar secciones anteriores de video si las hubiera y reemplazar por el GIF
-    if "assets/demo_conciliacion.mp4" in content:
-        content = content.replace(
-            '<source src="assets/demo_conciliacion.mp4" type="video/mp4">',
-            ''
-        )
-    
-    if "## 🎥 Demostración y Funcionamiento del Sistema" in content:
-        print("[*] La sección de demostración ya está integrada en el README.")
+    # Insertar la sección de demostración justo después del primer título principal (# )
+    if content.startswith("# "):
+        first_newline = content.find("\n")
+        if first_newline != -1:
+            new_content = content[:first_newline] + "\n" + demo_section + content[first_newline:]
+        else:
+            new_content = content + "\n" + demo_section
     else:
-        new_content = content + "\n" + demo_section
-        readme_path.write_text(new_content, encoding="utf-8")
-        print("[+] ¡README.md actualizado con la visualización en formato GIF!")
+        new_content = demo_section + "\n" + content
+
+    readme_path.write_text(new_content, encoding="utf-8")
+    print("[+] ¡README.md actualizado con la demostración posicionada al principio!")
 
 def main():
     output_path = Path("assets/demo_conciliacion.gif")
@@ -105,7 +106,6 @@ def main():
         recorder_thread.join()
         
         if frames_list:
-            # Guardar los fotogramas capturados en formato GIF animado con bucle infinito
             imageio.mimsave(str(output_path), frames_list, fps=10, loop=0)
             print(f"[✔] ¡GIF generado exitosamente en: {output_path}!")
         else:
@@ -113,7 +113,7 @@ def main():
         
         print("[*] Actualizando documentación en el README...")
         update_readme()
-        print("\n[✔] ¡Proceso completo! Ya puedes hacer commit y push para ver el GIF en GitHub.")
+        print("\n[✔] ¡Proceso completo! Ya puedes hacer commit y push para ver el GIF arriba en GitHub.")
 
 if __name__ == "__main__":
     main()
